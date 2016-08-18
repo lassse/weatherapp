@@ -1,54 +1,80 @@
+
 <!DOCTYPE html>
 <html>
 <head>
 	<meta charset="utf-8">
-	<title>Weather App</title>
+	<title>p</title>
 	<style>
-		html,body{
+		html, body {
 			margin: 0;
-		}
-		#app {
-			position: absolute;
-			width: 100%;
-			height: 100%;
-			overflow: hidden;
+			background: #e8e8e8;
 		}
 	</style>
 </head>
 <body>
-<div id="app"></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.5/TweenMax.min.js"></script>
+<canvas id="cvs"></canvas>
+
 <script>
-function init() {
-	var icon = '💧';
-	var total = 50;
-	var app = document.querySelector('#app');
+var cvs = document.querySelector('#cvs');
+var ctx = cvs.getContext('2d')
+
+var particles = [];
+var totalParticles = 300;
+
+function Particle() {
+	var item = {};
 	
-	var TM = TweenMax
-	
-	for (var i = 0; i < total; i++) {
-		var _p = document.createElement('div');	
-		_p.style.position = 'absolute'
-		_p.style.width = 50 + 'px';
-		_p.style.height = 50 + 'px';
-		_p.textContent = icon;
+	item.reset = function() {
+		item.x = Math.random() * width
+		item.y = (Math.random() * height * 1.2) * -1
 
+		item.scale = Math.random() + 0.3
 
-		TM.set(_p, {
-			x: Math.random() * window.innerWidth,
-			y: -50,
-			scale: Math.random() + 0.4
-		})
+		item.vx = (Math.random() * 0.2) - 0.1
+		item.vy = 7 + (Math.random() * 3)
 
-		TM.to(_p, (Math.random() * 2) + 1, {
-			delay: Math.random() * 2,
-			ease: Linear.easeNone,
-			y: window.innerHeight,
-			x: '+=' + ((Math.random() * 100) - 50),
-		});
-		app.appendChild(_p);
 	}
+
+	item.reset()
+	return item
 }
+
+function draw() {
+	ctx.clearRect(0,0,width, height)
+
+	for (var i = 0; i < totalParticles; i++) {
+		var item = particles[i]
+		item.x += item.vx;
+		item.y += item.vy;
+
+		if (item.y >= height) {
+			item.reset()
+		}
+
+		// ctx.fillRect(item.x, item.y, 10 * item.scale, 10 * item.scale);
+		ctx.font = item.scale * 20 + 'px Arial';
+		ctx.fillText("💧", item.x, item.y)
+		particles[i] = item
+	}
+
+	requestAnimationFrame(draw)
+}
+function init() {
+	width = window.innerWidth
+	height = window.innerHeight
+
+	cvs.width = width
+	cvs.height = height
+
+	for (var i = 0; i < totalParticles; i++) {
+		var p = new Particle()
+		particles[i] = p;
+	}
+
+	requestAnimationFrame(draw)
+}
+
+
 window.addEventListener('load', init);
 </script>
 </body>
